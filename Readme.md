@@ -6,11 +6,7 @@
 * attach an Advanced Monitor (min 2x3) to the right of your computer
 * run `touch` on your computer
 
-## APIs
-
-At the moment there are the following APIs available:
-
-### eventDispatcherAPI
+## eventDispatcherAPI
 
 This API allows you to register functions with will be called if a specific  [events](http://computercraft.info/wiki/Os.pullEvent#Event_types) occures.
 
@@ -26,11 +22,11 @@ eventDispatcherAPI.addHandler(eventName, func)
 eventDispatcherAPI.runDispatchLoop()
 ```
 
-### touchScreenAPI
+## touchScreenAPI
 
 A simple API to draw buttons on a monitor and handle touch events.
 
-#### Display
+### Display
 
 This is the most basic object, a representation of one attached Monitor
 
@@ -54,7 +50,7 @@ display:addButton(button)
 display:handleEvent(xPos, yPos)
 ```
 
-#### Button
+### Button
 
 A button which is clickable.
 
@@ -73,7 +69,7 @@ button:addListener(func)
 button:draw(term)
 ```
 
-#### Rectangle
+### Rectangle
 
 Just a plain rectangle.
 
