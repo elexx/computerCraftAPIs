@@ -1,0 +1,70 @@
+-------------------------------------------------------------------------------
+
+-- attach a 2x3 monitor the the right
+-- attach bundled cable to the left
+-- attach a lamp to a yellow end of the bundled cable
+-- attach a lever to a black and a lever lime end of the bundled cable
+-- run "touch"
+
+os.loadAPI("touchScreenAPI")
+os.loadAPI("eventDispatcherAPI")
+
+display = touchScreenAPI.Display:create("right")
+display:resetAndClear()
+
+function colorToggle(button)
+	if button.textColor == colors.black then
+		button.textColor = colors.orange
+		if button == button1 then
+			rs.setBundledOutput("left", colors.yellow)
+		end
+	else
+		button.textColor = colors.black
+		if button == button1 then
+			rs.setBundledOutput("left", 0)
+		end
+	end
+	return true -- request redraw
+end
+
+button1 = touchScreenAPI.Button:create("lamp!", 2, 2)
+button1:setColors(colors.black, colors.white)
+button1:addListener(colorToggle)
+button1:draw(display.term)
+
+button2 = touchScreenAPI.Button:create("anotherbutton", 2, 6)
+button2:setColors(colors.black, colors.white)
+button2:addListener(colorToggle)
+button2:draw(display.term)
+
+
+display:addButton(button1)
+display:addButton(button2)
+
+rec1 = touchScreenAPI.Rectangle:create(0, 15, 2, 3)
+rec1:setBackgroundColor(colors.white)
+rec1:draw(display.term)
+
+eventDispatcherAPI.addHandler("monitor_touch",
+	function(event, side, xPos, yPos)
+		display:handleEvent(xPos, yPos)
+	end
+)
+
+eventDispatcherAPI.addHandler("redstone",
+	function(event, _, _, _)
+		if colors.test(rs.getBundledInput("left"), colors.combine(colors.black, colors.lime)) then
+			rec1:setBackgroundColor(colors.orange)
+		elseif colors.test(rs.getBundledInput("left"), colors.black) then
+			rec1:setBackgroundColor(colors.red)
+		elseif colors.test(rs.getBundledInput("left"), colors.lime) then
+			rec1:setBackgroundColor(colors.lime)
+		else
+			rec1:setBackgroundColor(colors.white)
+		end
+		rec1:draw(display.term)
+	end
+)
+
+eventDispatcherAPI.runDispatchLoop() -- forever
+

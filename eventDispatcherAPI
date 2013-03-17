@@ -1,0 +1,20 @@
+
+local handlers = {}
+
+function addHandler(eventName, func)
+	if handlers[eventName] == nil then
+		handlers[eventName] = {}
+	end
+	table.insert(handlers[eventName], func)
+end
+function runDispatchLoop()
+	while true do
+		event, param1, param2, param3 = os.pullEvent()
+		if handlers[event] ~= nil then
+			for _, func in pairs(handlers[event]) do
+				func(event, param1, param2, param3)
+			end
+		end
+	end
+end
+
