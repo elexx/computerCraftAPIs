@@ -1,0 +1,80 @@
+-- vim: set filetype=lua:
+
+local viewport = {
+	--- moves the panel behind the viewport
+	-- e.g. a relative movement
+	-- @see setPosition
+	move = function(self, x, y)
+		self.offx = self.offx + x
+		self.offy = self.offy + y
+	end,
+
+	--- sets the panels position
+	-- e.g. a absolute movement
+	-- @see move
+	setPosition = function(self, x, y)
+		self.offx = x
+		self.offy = y
+	end,
+
+	--- redraws all elements
+	-- @see addElement
+	redraw = function(self)
+		self.term.setTextColor(colors.white)
+		self.term.setBackgroundColor(colors.black)
+		self.term.clear()
+		for _, element in pairs(self.elements) do
+			if type(element.draw) == "function" then
+				element:draw(self.term, self.offx, self.offy)
+			end
+		end
+	end,
+
+	--- adds an element to this viewport
+	-- has to implement a draw function
+	-- has to have x, y, width and heigth parameters or functions
+	-- can have a text parameter
+	-- can implement a callback which will be called upon clicking
+	addElement = function(self, element)
+		table.insert(self.elements, element)
+	end,
+
+	--- handles a click on xPos, yPos of this viewport
+	handleClick = function(self, xPos, yPos)
+		redraw = false
+		termx, termy = self.term.getSize()
+		for _, element in pairs(self.elements) do
+			if type(element.callback) == "function" then
+				startx = type(element.x) == "function" and element:x(termx, termy) or element.x
+				starty = type(element.y) == "function" and element:y(termx, termy) or element.y
+				width = type(element.width) == "function" and element:width(termx, termy) or element.width
+				height = type(element.height) == "function" and element:height(termx, termy) or element.height
+				if (element.isSticky and xPos >= startx and xPos < (startx + width) and yPos >= starty and yPos < (starty + height)) then
+					redraw = element.callback(element, xPos, yPos) or redraw
+				elseif ((not element.isSticky) and (xPos - self.offx) >= startx and (xPos - self.offx) < (startx + width) and (yPos - self.offy) >= starty and (yPos - self.offy) < (starty + height)) then
+					redraw = element.callback(element, xPos - self.offx, yPos - self.offy) or redraw
+				end
+			end
+		end
+		if redraw then
+			self:redraw()
+		end
+		return redraw
+	end
+}
+--- creates a new viewport
+-- @param term the term to draw on
+function new(term)
+	assert(type(term) == "table", "createViewport: expected term")
+	local o = {
+		term = term,
+		offx = 0,
+		offy = 0,
+		elements = {}
+	}
+
+	setmetatable(o, {__index = viewport})
+
+	return o
+end
+

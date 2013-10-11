@@ -1,20 +1,57 @@
+-- vim: set filetype=lua:
 
 local handlers = {}
+local defaultHandler = nil
 
+--- adds an handler to be called in case an event with eventName gets queued
+-- @param eventName a string that identifies the event
+-- @param func a function callback that will be called
 function addHandler(eventName, func)
+	assert(type(func) == "function", "func is no function")
 	if handlers[eventName] == nil then
 		handlers[eventName] = {}
 	end
 	table.insert(handlers[eventName], func)
 end
+
+--- sets the default handler, which will be called if
+-- * no event handler exists and
+-- * the event is not "terminate"
+-- to handle "terminate" manually just 
+-- @param func the function callback
+function setDefaultHandler(func)
+	assert(type(func) == "function", "func is no function")
+	defaultHandler = func
+end
+
+--- just for the sake of completness
+-- this is just a wrapper to os.queueEvent()
+function queueEvent(eventName, param1, param2, param3)
+	os.queueEvent(eventName, param1, param2, param3)
+end
+
+--- fires up the event dispatcher
+-- procedure:
+-- * event gets queued
+-- * dispatcher fetches it and checks if there are any handlers interessted in this event and calls them one by one
+-- * if no handler is registered, checks if is the "terminate" event, runDispatchLoop will return in this case
+-- * if this is not the case and a default handler has been set, this one will be called
+-- * otherwise the event will just be ignored
 function runDispatchLoop()
-	while true do
-		event, param1, param2, param3 = os.pullEvent()
+	abort = false
+	repeat
+		event, param1, param2, param3 = os.pullEventRaw()
 		if handlers[event] ~= nil then
 			for _, func in pairs(handlers[event]) do
-				func(event, param1, param2, param3)
+				abort = func(event, param1, param2, param3)
+			end
+		elseif event == "terminate" then
+			return
+		else
+			if defaultHandler ~= nil then
+				abort = defaultHandler(event, param1, param2, param3)
 			end
 		end
-	end
+	until abort
 end
 

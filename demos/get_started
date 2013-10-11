@@ -1,0 +1,26 @@
+-- vim:set filetype=lua:
+
+os.loadAPI("viewportAPI")
+os.loadAPI("buttonAPI")
+
+viewport = viewportAPI.new(term)
+
+button = buttonAPI.new({
+	x = 1, y = 1, width = 10, height = 1
+})
+
+viewport:addElement(button)
+viewport:redraw()
+
+function clickHandler(element, posX, posY)
+	element.backgroundColor = element.backgroundColor == colors.white and colors.green or colors.white
+	return true
+end
+
+button.callback = clickHandler
+
+while true do
+	event, side, xPos, yPos = os.pullEvent("mouse_click")
+	viewport:handleClick(xPos, yPos)
+end
+
