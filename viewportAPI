@@ -10,7 +10,7 @@ local viewport = {
 	end,
 
 	--- sets the panels position
-	-- e.g. a absolute movement
+	-- i.e. an absolute movement
 	-- @see move
 	setPosition = function(self, x, y)
 		self.offx = x
