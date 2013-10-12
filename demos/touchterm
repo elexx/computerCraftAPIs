@@ -1,0 +1,97 @@
+-- vim: set filetype=lua:
+
+if viewportAPI then os.unloadAPI("viewportAPI") end
+os.loadAPI("viewportAPI")
+if buttonAPI then os.unloadAPI("buttonAPI") end
+os.loadAPI("buttonAPI")
+if eventDispatcherAPI then os.unloadAPI("eventDispatcherAPI") end
+os.loadAPI("eventDispatcherAPI")
+
+viewport = viewportAPI.new(term)
+
+buttonUp = buttonAPI.new({
+	text = "up",
+	x = buttonAPI.anchorLeft,
+	y = buttonAPI.anchorTop,
+	isSticky = true,
+	width = buttonAPI.maxWidth,
+	height = 1
+})
+viewport:addElement(buttonUp)
+
+buttonDown = buttonAPI.new({
+	text = "down",
+	x = buttonAPI.anchorLeft,
+	y = buttonAPI.anchorBottom,
+	isSticky = true,
+	width = buttonAPI.maxWidth,
+	height = 1
+})
+viewport:addElement(buttonDown)
+
+buttonLeft = buttonAPI.new({
+	text = "left",
+	x = buttonAPI.anchorLeft,
+	y = buttonAPI.anchorTop,
+	isSticky = true,
+	width = 1,
+	height = buttonAPI.maxHeight,
+	isVertical = true
+})
+viewport:addElement(buttonLeft)
+
+buttonRight = buttonAPI.new({
+	text = "right",
+	x = buttonAPI.anchorRight,
+	y = buttonAPI.anchorTop,
+	isSticky = true,
+	width = 1,
+	height = buttonAPI.maxHeight,
+	isVertical = true
+})
+viewport:addElement(buttonRight)
+
+testbtn = buttonAPI.new({
+	text = "test",
+	x = 5,
+	y = 5,
+	height = 1,
+	width = 6,
+	isSticky = false,
+	backgroundColor = colors.green
+})
+viewport:addElement(testbtn)
+
+viewport:redraw()
+
+handler = function(element, x, y)
+	dx = 0
+	dy = 0
+	if element == buttonUp then
+		dy = -1
+	elseif element == buttonDown then
+		dy = 1
+	elseif element == buttonLeft then
+		dx = -1
+	elseif element == buttonRight then
+		dx = 1
+	elseif element == testbtn then
+		testbtn.backgroundColor = testbtn.backgroundColor == colors.green and colors.red or colors.green
+	else
+		error("Unknown Button")
+	end
+	viewport:move(dx, dy)
+	return true -- requests redraw of current viewport
+end
+
+buttonUp.callback = handler
+buttonDown.callback = handler
+buttonLeft.callback = handler
+buttonRight.callback = handler
+testbtn.callback = handler
+
+eventDispatcherAPI.addHandler("mouse_click", function(event, side, xPos, yPos)
+	viewport:handleClick(xPos, yPos)
+end)
+
+eventDispatcherAPI.runDispatchLoop()
