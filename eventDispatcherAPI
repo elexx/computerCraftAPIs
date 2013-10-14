@@ -58,19 +58,19 @@ function runDispatchLoop()
 		if handlers[eventName] ~= nil then
 			if handlers[eventName][side] ~= nil then
 				for _, func in pairs(handlers[eventName][side]) do
-					abort = func(unpack(params))
+					abort = func(unpack(params)) or abort
 				end
 			end
 			if handlers[eventName]["___all"] ~= nil then
 				for _, func in pairs(handlers[eventName]["___all"]) do
-					abort = func(unpack(params))
+					abort = func(unpack(params)) or abort
 				end
 			end
 		elseif eventName == "terminate" then
 			return
 		else
 			if defaultHandler ~= nil then
-				abort = defaultHandler(unpack(params))
+				abort = defaultHandler(unpack(params)) or abort
 			end
 		end
 	until abort
