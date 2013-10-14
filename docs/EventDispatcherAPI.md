@@ -7,6 +7,9 @@ The event dispatcher is designed to just exist once on a machine. There is no us
 ### addHandler
 `eventDispatcherAPI.addHandler(eventName, func)` adds an handler for a given event name. There can be multiple handlers for one event name.
 
+### addFilteredHandler
+`eventDispatcherAPI.addFilteredHandler(eventName, filter, func)` adds an handler for a given event name and a given filter. There can be multiple handlers for one event name and filter. A filter is the first parameter returned from os.pullEvent() - see [computercraft.info/wiki/Os.pullEvent#Event_types](http://computercraft.info/wiki/Os.pullEvent#Event_types)
+
 ### setDefaultHandler
 `eventDispatcherAPI.setDefaultHandler(func)` sets a handler to be called if no other handler exists and the event is not "terminate".
 
