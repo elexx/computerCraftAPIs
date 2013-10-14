@@ -3,15 +3,27 @@
 local handlers = {}
 local defaultHandler = nil
 
---- adds an handler to be called in case an event with eventName gets queued
+--- adds a handler to be called in case an event with eventName and if the first parameter == filter gets queued (see http://computercraft.info/wiki/Os.pullEvent#Event_types)
 -- @param eventName a string that identifies the event
--- @param func a function callback that will be called
-function addHandler(eventName, func)
-	assert(type(func) == "function", "func is no function")
+-- @param side the side-filter for this function, can also be the name of a wired-network peripheral, like "monitor_0"
+-- @param func the callback function that will be called
+function addFilteredHandler(eventName, filter, func)
+	assert(type(func) == "function", "addSidedHandler: func is no function")
 	if handlers[eventName] == nil then
 		handlers[eventName] = {}
 	end
-	table.insert(handlers[eventName], func)
+	if handlers[eventName][filter] == nil then
+		handlers[eventName][filter] = {}
+	end
+	table.insert(handlers[eventName][filter], func)
+end
+
+--- adds an handler to be called in case an event with eventName gets queued
+-- @param eventName a string that identifies the event
+-- @param func the callback function that will be called
+function addHandler(eventName, func)
+	assert(type(func) == "function", "addHandler: func is no function")
+	addFilteredHandler(eventName, "___all", func)
 end
 
 --- sets the default handler, which will be called if
@@ -40,16 +52,25 @@ end
 function runDispatchLoop()
 	abort = false
 	repeat
-		event, param1, param2, param3 = os.pullEventRaw()
-		if handlers[event] ~= nil then
-			for _, func in pairs(handlers[event]) do
-				abort = func(event, param1, param2, param3)
+		params = {os.pullEventRaw()}
+		eventName = params[1]
+		side = params[2]
+		if handlers[eventName] ~= nil then
+			if handlers[eventName][side] ~= nil then
+				for _, func in pairs(handlers[eventName][side]) do
+					abort = func(unpack(params))
+				end
 			end
-		elseif event == "terminate" then
+			if handlers[eventName]["___all"] ~= nil then
+				for _, func in pairs(handlers[eventName]["___all"]) do
+					abort = func(unpack(params))
+				end
+			end
+		elseif eventName == "terminate" then
 			return
 		else
 			if defaultHandler ~= nil then
-				abort = defaultHandler(event, param1, param2, param3)
+				abort = defaultHandler(unpack(params))
 			end
 		end
 	until abort
