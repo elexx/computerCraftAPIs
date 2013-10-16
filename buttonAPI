@@ -95,6 +95,40 @@ function new(options)
 	return o
 end
 
+function newText(options)
+	assert(isOneOfTypes(options.x, "number", "function"), "button.newLabel: x is not a number or function")
+	assert(isOneOfTypes(options.y, "number", "function"), "button.newLabel: y is not a number or function")
+	assert(isOneOfTypes(options.width, "number", "function"), "button.newLabel: width is not a number or function")
+	assert(isOneOfTypes(options.height, "number", "function"), "button.newLabel: height is not a number or function")
+	assert(isOneOfTypes(options.text, "string"), "button.newLabel: text is not a string")
+
+	local o = {
+		x = options.x,
+		y = options.y,
+		width = options.width,
+		height = options.height,
+		text = options.text,
+	}
+
+	setmetatable(o, {__index = button})
+
+	return o
+end
+
+function newLabel(options)
+	assert(isOneOfTypes(options.button, "table"), "button.newLabel: button is not a button")
+	o = newText(options)
+	o.button = options.button;
+
+	o.callback = function(self, xPos, yPos)
+		if type(self.button.callback) == "function" then
+			return self.button:callback(xPos, yPos)
+		end
+	end
+
+	return o
+end
+
 --
 -- some usefull helper functions
 anchorTop = 1

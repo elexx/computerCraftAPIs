@@ -49,9 +49,9 @@ local viewport = {
 			if type(element.callback) == "function" then
 				startx, starty, width, height, isSticky = element:get("x", "y", "width", "height", "isSticky")
 				if (isSticky and xPos >= startx and xPos < (startx + width) and yPos >= starty and yPos < (starty + height)) then
-					redraw = element.callback(element, xPos, yPos) or redraw
+					redraw = element:callback(xPos, yPos) or redraw
 				elseif ((not isSticky) and (xPos - self.offx) >= startx and (xPos - self.offx) < (startx + width) and (yPos - self.offy) >= starty and (yPos - self.offy) < (starty + height)) then
-					redraw = element.callback(element, xPos - self.offx, yPos - self.offy) or redraw
+					redraw = element:callback(xPos - self.offx, yPos - self.offy) or redraw
 				end
 			end
 		end
