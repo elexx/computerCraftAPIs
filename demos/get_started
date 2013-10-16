@@ -3,7 +3,7 @@
 os.loadAPI("viewportAPI")
 os.loadAPI("buttonAPI")
 
-viewport = viewportAPI.new(term)
+viewport = viewportAPI.new({term = term})
 
 button = buttonAPI.new({
 	x = 1, y = 1, width = 10, height = 1

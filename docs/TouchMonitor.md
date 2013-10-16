@@ -14,8 +14,8 @@ This demo is very similar to [docs/TouchTerm.md](./TouchTerm.md), but this time 
 Just wrap the connected monitors and get a viewport for each of them.
 
 ```lua
-viewportLeft = viewportAPI.new(peripheral.wrap("monitor_0"))
-viewportRight = viewportAPI.new(peripheral.wrap("monitor_1"))
+viewportLeft = viewportAPI.new({term = peripheral.wrap("monitor_0")})
+viewportRight = viewportAPI.new({term = peripheral.wrap("monitor_1")})
 ```
 
 ## Drawing the buttons

@@ -20,11 +20,13 @@ local viewport = {
 	--- redraws all elements
 	-- @see addElement
 	redraw = function(self)
-		self.term.setTextColor(colors.white)
-		self.term.setBackgroundColor(colors.black)
+		self.term.setTextColor(self.textColor)
+		self.term.setBackgroundColor(self.backgroundColor)
 		self.term.clear()
 		for _, element in pairs(self.elements) do
 			if type(element.draw) == "function" then
+				self.term.setTextColor(self.textColor)
+				self.term.setBackgroundColor(self.backgroundColor)
 				element:draw(self.term, self.offx, self.offy)
 			end
 		end
@@ -64,10 +66,12 @@ local viewport = {
 }
 --- creates a new viewport
 -- @param term the term to draw on
-function new(term)
-	assert(type(term) == "table", "createViewport: expected term")
+function new(options)
+	assert(type(options.term) == "table", "createViewport: expected term")
 	local o = {
-		term = term,
+		term = options.term,
+		textColor = options.textColor or colors.white,
+		backgroundColor = options.backgroundColor or colors.black,
 		offx = 0,
 		offy = 0,
 		elements = {}

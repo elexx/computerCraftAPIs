@@ -1,7 +1,9 @@
 # ViewportAPI Documentation
 
-* `viewportAPI.new(term)` returns a new viewport
-* `term` the terminal which will be managed by the new viewport
+* `viewportAPI.new({})` returns a new viewport. parameters are provided as a table:
+* `term` the terminal which will be managed by the new viewport - required
+* `textColor` the default text color - defaults to white
+* `backgroundColor` the default background color - defaults to black
 
 ## Methods
 

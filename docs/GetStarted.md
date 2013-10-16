@@ -9,7 +9,7 @@ First of all, copy the apis to your computer and load the apis with `os.loadAPI(
 Create a new viewport:
 
 ```lua
-viewport = viewportAPI.new(term)
+viewport = viewportAPI.new({term = term})
 ```
 
 where `term` can be the default term which resolves to the current computer screen or any wrapped peripheral which provides a terminal.

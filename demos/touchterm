@@ -7,7 +7,7 @@ os.loadAPI("buttonAPI")
 if eventDispatcherAPI then os.unloadAPI("eventDispatcherAPI") end
 os.loadAPI("eventDispatcherAPI")
 
-viewport = viewportAPI.new(term)
+viewport = viewportAPI.new({term = term})
 
 buttonUp = buttonAPI.new({
 	text = "up",
