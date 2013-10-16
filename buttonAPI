@@ -1,60 +1,64 @@
 -- vim: set filetype=lua:
 
+-- a basic draw function, used by draw
+local rawDraw = function(term, startx, starty, width, height, textx, texty, text, isVertical)
+	c = 0
+	y = starty
+	while y < starty + height do
+		term.setCursorPos(startx, y)
+		x = startx
+		while x < startx + width do
+			if text and not isVertical and y == texty and x == textx + c and c < #text then
+				term.write(text:sub(c + 1, c + 1))
+				c = c + 1
+			elseif text and isVertical and y == texty + c and x == textx and c < #text then
+				term.write(text:sub(c + 1, c + 1))
+				c = c + 1
+			else
+				term.write(" ")
+			end
+			x = x + 1
+		end
+		y = y + 1
+	end
+end
+
 local button = {
+	get = function(self, ...)
+		ret = {}
+		for _, par in ipairs(arg) do
+			table.insert(ret, type(self[par]) == "function" and self[par](self, termx, termy) or self[par])
+		end
+		return unpack(ret)
+	end,
+
 	-- draw the button
 	-- takes the term and the panel offset
 	draw = function(self, term, offx, offy)
-		if self.isSticky then
+		if self:get("isSticky") then
 			offx = 0
 			offy = 0
 		end
 
 		termx, termy = term.getSize()
+		startx, starty, width, height, text, isVertical, textColor, backgroundColor = self:get("x", "y", "width", "height", "text", "isVertical", "textColor", "backgroundColor")
 
-		startx = type(self.x) == "function" and self:x(termx, termy) or self.x
-		starty = type(self.y) == "function" and self:y(termx, termy) or self.y
-		width = type(self.width) == "function" and self:width(termx, termy) or self.width
-		height = type(self.height) == "function" and self:height(termx, termy) or self.height
-
-		if self.isVertical then
+		if isVertical then
 			textX = startx + math.floor(width / 2)
-			textY = starty + math.floor((height - #self.text) / 2)
-		elseif not self.isVertical then
-			textX = startx + math.floor((width - #self.text) / 2)
+			textY = starty + math.floor((height - #text) / 2)
+		else
+			textX = startx + math.floor((width - #text) / 2)
 			textY = starty + math.floor(height / 2)
 		end
 
-		self:rawDraw(term, startx + offx, starty + offy, width, height, textX + offx, textY + offy, self.text)
-	end,
-
-	-- a basic draw function, used by draw
-	rawDraw = function(self, term, startx, starty, width, height, textx, texty, text)
-		term.setTextColor(self.textColor)
-		term.setBackgroundColor(self.backgroundColor)
-
-		c = 0
-		y = starty
-		while y < starty + height do
-			term.setCursorPos(startx, y)
-			x = startx
-			while x < startx + width do
-				if text ~= nil then
-					if not self.isVertical and y == texty and x == textx + c and c < #text then
-						term.write(text:sub(c + 1, c + 1))
-						c = c + 1
-					elseif self.isVertical and y == texty + c and x == textx and c < #text then
-						term.write(text:sub(c + 1, c + 1))
-						c = c + 1
-					else
-						term.write(" ")
-					end
-				else
-					term.write(" ")
-				end
-				x = x + 1
-			end
-			y = y + 1
+		if textColor then
+			term.setTextColor(textColor)
 		end
+		if backgroundColor then
+			term.setBackgroundColor(backgroundColor)
+		end
+
+		rawDraw(term, startx + offx, starty + offy, width, height, textX + offx, textY + offy, text, isVertical)
 	end
 }
 
