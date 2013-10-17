@@ -1,0 +1,70 @@
+-- vim: set filetype=lua:
+
+-- helper functions
+local function getFile(filename, url)
+	response = http.get(url)
+	if response then
+		sResponse = response.readAll()
+		response.close()
+
+		file = fs.open(filename, "w")
+		file.write(sResponse)
+		file.close()
+		return true
+	else
+		return false
+	end
+end
+
+
+-- configs
+local url = "https://raw.github.com/elexx/computerCraftAPIs/master/"
+local args = {...}
+local isUpdate = args[1] == "update"
+
+
+-- main program
+if not http then
+	print("enable http!")
+	return
+end
+
+write("loading filelist... ")
+local response = http.get(url .. "installer/files")
+
+if not response then
+	print("Failed.")
+	return
+end
+print("Success.")
+tFileList = textutils.unserialize(response.readAll())
+response.close()
+
+print("Start downloadin files:")
+
+for groupname, group in pairs(tFileList) do
+	repeat
+		write("Download " .. groupname .."? [Yn]: ")
+		answer = read()
+	until answer == "y" or answer == "Y" or answer == "n" or answer == "N" or answer == ""
+
+	if answer == "y" or answer == "Y" or answer == "" then
+		for filename, urlpart in pairs(group) do
+			path = shell.resolve(filename)
+			write("loading " .. filename .. "... ")
+			if not fs.exists(path) or isUpdate then
+				if getFile(filename, url .. urlpart) then
+					print("Success.")
+				else
+					print("Failed.")
+				end
+			else
+				print("Exists. Skipping.")
+			end
+		end
+	else
+		print("Skipping " .. groupname)
+	end
+end
+print("Done.")
+print("To update, run: installer update")

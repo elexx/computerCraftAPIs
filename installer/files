@@ -1,0 +1,13 @@
+{
+	apis = {
+		viewportAPI = "viewportAPI",
+		buttonAPI = "buttonAPI",
+		eventDispatcherAPI = "eventDispatcherAPI",
+	},
+	demos = {
+		get_started = "demos/get_started",
+		touchterm = "demos/touchterm",
+		touchmonitor = "demos/touchmonitor",
+		texts_and_labels = "demos/texts_and_labels",
+	},
+}
