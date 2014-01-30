@@ -1,0 +1,33 @@
+-- vim:set filetype=lua:
+
+if viewportAPI then os.unloadAPI("viewportAPI") end
+os.loadAPI("viewportAPI")
+if buttonAPI then os.unloadAPI("buttonAPI") end
+os.loadAPI("buttonAPI")
+
+
+viewport = viewportAPI.new({term = term})
+
+button = buttonAPI.new({
+	x = 1, y = 1, width = 10, height = 1
+})
+
+viewport:addElement(button)
+viewport:redraw()
+
+counter = 0
+function clickHandler(element, posX, posY)
+	element.backgroundColor = element.backgroundColor == colors.white and colors.green or colors.white
+	counter = counter + 1
+	if counter == 3 then
+		viewport:removeElement(button)
+	end
+	return true
+end
+
+button.callback = clickHandler
+
+while true do
+	event, side, xPos, yPos = os.pullEvent("mouse_click")
+	viewport:handleClick(xPos, yPos)
+end

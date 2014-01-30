@@ -44,6 +44,11 @@ local viewport = {
 		table.insert(self.elements, element)
 	end,
 
+	--- removes an element from this viewport
+	removeElement = function(self, element)
+		table.insert(self.scheduledForRemoval, element)
+	end,
+
 	--- handles a click on xPos, yPos of this viewport
 	handleClick = function(self, xPos, yPos)
 		redraw = false
@@ -57,9 +62,20 @@ local viewport = {
 				end
 			end
 		end
+
+		for i = #self.elements, 1, -1 do
+			for _, v in ipairs(self.scheduledForRemoval) do
+				if v == self.elements[i] then
+					table.remove(self.elements, i)
+				end
+			end
+		end
+		self.scheduledForRemoval = {}
+
 		if redraw then
 			self:redraw()
 		end
+
 		return redraw
 	end
 }
@@ -74,7 +90,8 @@ function new(options)
 		textScale = options.textScale or 1,
 		offx = 0,
 		offy = 0,
-		elements = {}
+		elements = {},
+		scheduledForRemoval = {},
 	}
 
 	setmetatable(o, {__index = viewport})

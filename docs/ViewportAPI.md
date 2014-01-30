@@ -10,6 +10,7 @@
 * `viewport:move(x, y)` moves the panel behin the viewport.
 * `viewport:setPosition(x, y)` set the panels position, i.e. an absolute movement
 * `viewport:addElement(element)` adds an element, e.g. a button created by the [buttonAPI](../buttonAPI) ([docs](./ButtonAPI.md))
+* `viewport:removeElement(element)` removes an element from a viewport
 * `viewport:handleClick(xPos, yPos)` calls the callback function of every element at the given position
 * `viewport:redraw()` redraws all element on this viewport
 
