@@ -24,8 +24,9 @@ local rawDraw = function(term, startx, starty, width, height, textx, texty, text
 end
 
 local button = {
-	get = function(self, ...)
+	get = function(self, term, ...)
 		ret = {}
+		termx, termy = term.getSize()
 		for _, par in ipairs(arg) do
 			table.insert(ret, type(self[par]) == "function" and self[par](self, termx, termy) or self[par])
 		end
@@ -35,13 +36,12 @@ local button = {
 	-- draw the button
 	-- takes the term and the panel offset
 	draw = function(self, term, offx, offy)
-		if self:get("isSticky") then
+		isSticky, startx, starty, width, height, text, isVertical, textColor, backgroundColor = self:get(term, "isSticky", "x", "y", "width", "height", "text", "isVertical", "textColor", "backgroundColor")
+
+		if isSticky then
 			offx = 0
 			offy = 0
 		end
-
-		termx, termy = term.getSize()
-		startx, starty, width, height, text, isVertical, textColor, backgroundColor = self:get("x", "y", "width", "height", "text", "isVertical", "textColor", "backgroundColor")
 
 		if isVertical then
 			textX = startx + math.floor(width / 2)
@@ -108,6 +108,10 @@ function newText(options)
 		width = options.width,
 		height = options.height,
 		text = options.text,
+		isSticky = options.isSticky or false,
+		isVertical = options.isVertical or false,
+		textColor = options.textColor or colors.white,
+		backgroundColor = options.backgroundColor or colors.black,
 	}
 
 	setmetatable(o, {__index = button})

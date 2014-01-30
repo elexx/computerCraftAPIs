@@ -22,6 +22,9 @@ local viewport = {
 	redraw = function(self)
 		self.term.setTextColor(self.textColor)
 		self.term.setBackgroundColor(self.backgroundColor)
+		if type(self.term.setTextScale) == "function" then
+			self.term.setTextScale(self.textScale)
+		end
 		self.term.clear()
 		for _, element in pairs(self.elements) do
 			if type(element.draw) == "function" then
@@ -44,10 +47,9 @@ local viewport = {
 	--- handles a click on xPos, yPos of this viewport
 	handleClick = function(self, xPos, yPos)
 		redraw = false
-		termx, termy = self.term.getSize()
 		for _, element in pairs(self.elements) do
 			if type(element.callback) == "function" then
-				startx, starty, width, height, isSticky = element:get("x", "y", "width", "height", "isSticky")
+				startx, starty, width, height, isSticky = element:get(self.term, "x", "y", "width", "height", "isSticky")
 				if (isSticky and xPos >= startx and xPos < (startx + width) and yPos >= starty and yPos < (starty + height)) then
 					redraw = element:callback(xPos, yPos) or redraw
 				elseif ((not isSticky) and (xPos - self.offx) >= startx and (xPos - self.offx) < (startx + width) and (yPos - self.offy) >= starty and (yPos - self.offy) < (starty + height)) then
@@ -69,6 +71,7 @@ function new(options)
 		term = options.term,
 		textColor = options.textColor or colors.white,
 		backgroundColor = options.backgroundColor or colors.black,
+		textScale = options.textScale or 1,
 		offx = 0,
 		offy = 0,
 		elements = {}
