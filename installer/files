@@ -9,5 +9,6 @@
 		touchterm = "demos/touchterm",
 		touchmonitor = "demos/touchmonitor",
 		texts_and_labels = "demos/texts_and_labels",
+		remove_element = "demos/remove_element",
 	},
 }
